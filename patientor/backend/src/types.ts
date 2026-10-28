@@ -21,13 +21,7 @@ const BaseEntrySchema = z.object({
   diagnosisCodes: z.array(z.string()).optional()
 });
 
-export interface BaseEntry {
-  id: string;
-  description: string;
-  date: string;
-  specialist: string;
-  diagnosisCodes?: Array<Diagnosis['code']>;
-}
+export type BaseEntry = z.infer<typeof BaseEntrySchema>;
 
 export const HealthCheckRating = {
   Healthy: 0,
@@ -36,12 +30,7 @@ export const HealthCheckRating = {
   CriticalRisk: 3,
 } as const;
 
-type HealthCheckRating = typeof HealthCheckRating[keyof typeof HealthCheckRating];
-
-interface HealthCheckEntry extends BaseEntry {
-  type: "HealthCheck";
-  healthCheckRating: HealthCheckRating;
-}
+export type HealthCheckRating = typeof HealthCheckRating[keyof typeof HealthCheckRating];
 
 const HealthCheckRatingUnion = z.union([
     z.literal(HealthCheckRating.Healthy),
@@ -55,21 +44,13 @@ const HealthCheckEntrySchema = BaseEntrySchema.safeExtend({
   healthCheckRating: HealthCheckRatingUnion
 });
 
+export type HealthCheckEntry = z.infer<typeof HealthCheckEntrySchema>;
+
+
 const constSickLeaveSchema = z.object({
   startDate: z.iso.date(),
   endDate : z.iso.date()
 });
-
-interface SickLeave {
-  startDate: string
-  endDate : string
-}
-
-interface OccupationalHealthcareEntry extends BaseEntry{
-  type: "OccupationalHealthcare";
-  employerName: string
-  sickLeave? : SickLeave
-}
 
 const OccupationalHealthcareEntrySchema = BaseEntrySchema.safeExtend({
   type: z.literal("OccupationalHealthcare"),
@@ -77,32 +58,26 @@ const OccupationalHealthcareEntrySchema = BaseEntrySchema.safeExtend({
   sickLeave : constSickLeaveSchema.optional()
 });
 
+export type OccupationalHealthcareEntry = z.infer<typeof OccupationalHealthcareEntrySchema>;
+
+
 const DischargeSchema = z.object({
   date: z.iso.date(),
   criteria : z.string()
 });
-
-interface Discharge {
-  date: string;
-  criteria: string
-}
 
 export const HospitalEntrySchema = BaseEntrySchema.safeExtend({
   type: z.literal("Hospital"),
   discharge : DischargeSchema
 });
 
-interface HospitalEntry extends BaseEntry{
-  type: "Hospital";
-  discharge : Discharge
-}
-
+export type HospitalEntry = z.infer<typeof HospitalEntrySchema>;
 
 export const NewEntrySchema = z.discriminatedUnion("type",[
-    HealthCheckEntrySchema.omit({id : true}),
-    OccupationalHealthcareEntrySchema.omit({id : true}),
-    HospitalEntrySchema.omit({id : true})
-]);;
+  HealthCheckEntrySchema.omit({id : true}),
+  OccupationalHealthcareEntrySchema.omit({id : true}),
+  HospitalEntrySchema.omit({id : true})
+]);
 
 export type Entry =
   | HospitalEntry
@@ -121,7 +96,6 @@ export const NewPatientSchema = z.object({
   ssn: z.string(),
   gender: z.enum(Gender),
   occupation: z.string(),
-  // entries: z.array(EntrySchema)
 });
 
 export type NewPatient = z.infer<typeof NewPatientSchema>;
@@ -130,4 +104,5 @@ export interface Patient extends NewPatient {
   id: string;
   entries: Entry[]
 }
+
 export type NonSensitivePatient = Omit<Patient, 'ssn' | 'entries'>;

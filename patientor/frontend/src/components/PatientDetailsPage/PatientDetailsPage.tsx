@@ -27,14 +27,14 @@ const PatientDetailsPage = ({diagnoses} : {diagnoses: Diagnosis[]}) => {
   }, [id]);
   if (patient) {
     return (
-      <div>
+      <div key='patient-details-page'>
         <h4>{patient.name}</h4>
         <p>gender: {patient.gender}</p>
         <p>ssn: {patient.ssn}</p>
         <p>occupation: {patient.occupation}</p>
         <p>date of birth: {patient.dateOfBirth}</p>
         <h5>entries</h5>
-        {patient.entries.map(entry => <EntryDetails entry={entry}/>)}
+        {patient.entries.map(entry => <EntryDetails key={entry.id} entry={entry}/>)}
         <AddEntryForm 
           id={patient.id}
           diagnoses={diagnoses}

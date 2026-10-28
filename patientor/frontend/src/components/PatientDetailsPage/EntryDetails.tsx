@@ -1,4 +1,4 @@
-import { HealthCheckRating, type Entry } from "../../types";
+import { type HealthCheckRating, type Entry } from "../../types";
 import { Box, Typography, Card, CardContent } from "@mui/material";
 import WorkIcon from '@mui/icons-material/Work';
 import MedicalServicesIcon from '@mui/icons-material/MedicalServices';

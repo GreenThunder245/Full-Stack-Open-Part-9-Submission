@@ -8,7 +8,7 @@ import { NewPatientParser, NewEntryParser, errorMiddleware } from '../middleware
 const router = express.Router();
 
 router.get('/', (_req, res : Response<NonSensitivePatient[]>) => {
-  res.send(patientService.getSSNRedactedPatients());
+  res.send(patientService.getNonSensitivePatients());
 });
 
 router.post('/', NewPatientParser, (req, res) => {
@@ -38,11 +38,11 @@ router.get('/:id', (req, res) => {
 
 router.post('/:id/entries', NewEntryParser, (req, res) => {
   try {
-    const entry = NewEntrySchema.parse(req.body);
+    const newEntry = NewEntrySchema.parse(req.body);
     const { id } = req.params;
     if (typeof id === 'string' || id instanceof String && typeof id != 'object') {
-      const changedPatient = patientService.addPatientEntry(id,entry);
-      if(changedPatient){
+      const entry = patientService.addPatientEntry(id,newEntry);
+      if(entry){
         res.status(201).send(entry);
       } else {
         res.status(404).send("Patient Not Found");
