@@ -1,4 +1,4 @@
-import type { Diagnosis } from '../../types/types.ts';
+import type { Diagnosis } from '../types.ts';
 import express, {type Response } from 'express';
 import diagnosisService from "../services/diagnosisService.ts";
 
